@@ -75,7 +75,7 @@ export default class PinchZoomPan extends React.Component {
     lastPanPointerPosition; //helps determine how far to pan the image
     lastPinchLength; //helps determine if we are pinching in or out
     animation; //current animation handle
-    imageRef; //image element
+    contentRef; //image element
     isImageLoaded; //permits initial transform
     originalOverscrollBehaviorY; //saves the original overscroll-behavior-y value while temporarily preventing pull down refresh
 
@@ -140,7 +140,7 @@ export default class PinchZoomPan extends React.Component {
         this.cancelAnimation();
         if (event.touches.length === 0 && event.changedTouches.length === 1) {
             if (this.lastPointerUpTimeStamp && this.lastPointerUpTimeStamp + DOUBLE_TAP_THRESHOLD > event.timeStamp) {
-                const pointerPosition = getRelativePosition(event.changedTouches[0], this.imageRef.parentNode);
+                const pointerPosition = getRelativePosition(event.changedTouches[0], this.contentRef.parentNode);
                 this.doubleClick(pointerPosition);
             }
             this.lastPointerUpTimeStamp = event.timeStamp;
@@ -165,13 +165,13 @@ export default class PinchZoomPan extends React.Component {
 
     handleMouseDoubleClick = event => {
         this.cancelAnimation();
-        var pointerPosition = getRelativePosition(event, this.imageRef.parentNode);
+        var pointerPosition = getRelativePosition(event, this.contentRef.parentNode);
         this.doubleClick(pointerPosition);
     }
 
     handleMouseWheel = event => {
         this.cancelAnimation();
-        const point = getRelativePosition(event, this.imageRef.parentNode);
+        const point = getRelativePosition(event, this.contentRef.parentNode);
         if (event.deltaY > 0) {
             if (this.state.scale > getMinScale(this.state, this.props)) {
                 this.zoomOut(point);
@@ -208,24 +208,24 @@ export default class PinchZoomPan extends React.Component {
 
     handleWindowResize = () => this.maybeHandleDimensionsChanged();
     
-    handleRefImage = ref => {
-        if (this.imageRef) {
+    handleContentRef = ref => {
+        console.log(ref)
+        if (this.contentRef) {
             this.cancelAnimation();
-            this.imageRef.removeEventListener('touchmove', this.handleTouchMove);
+            this.contentRef.removeEventListener('touchmove', this.handleTouchMove);
         }
-
-        this.imageRef = ref;
+        this.contentRef = ref;
         if (ref) {
-            this.imageRef.addEventListener('touchmove', this.handleTouchMove, { passive: false });
+            this.contentRef.addEventListener('touchmove', this.handleTouchMove, { passive: false });
         }
 
-        const { ref: imageRefProp } = React.Children.only(this.props.children);
-        setRef(imageRefProp, ref);
+        const { ref: contentRefProp } = React.Children.only(this.props.children);
+        setRef(contentRefProp, ref);
     };
 
     //actions
     pointerDown(clientPosition) {
-        this.lastPanPointerPosition = getRelativePosition(clientPosition, this.imageRef.parentNode);
+        this.lastPanPointerPosition = getRelativePosition(clientPosition, this.contentRef.parentNode);
     }
 
     pan(pointerClientPosition) {
@@ -239,7 +239,7 @@ export default class PinchZoomPan extends React.Component {
             return 0;
         }
 
-        const pointerPosition = getRelativePosition(pointerClientPosition, this.imageRef.parentNode);
+        const pointerPosition = getRelativePosition(pointerClientPosition, this.contentRef.parentNode);
         const translateX = pointerPosition.x - this.lastPanPointerPosition.x;
         const translateY = pointerPosition.y - this.lastPanPointerPosition.y;
         this.lastPanPointerPosition = pointerPosition;
@@ -318,8 +318,8 @@ export default class PinchZoomPan extends React.Component {
     //compare stored dimensions to actual dimensions; capture actual dimensions if different
     maybeHandleDimensionsChanged() {
         if (this.isImageReady) {
-            const containerDimensions = getContainerDimensions(this.imageRef);
-            const imageDimensions = getDimensions(this.imageRef);
+            const containerDimensions = getContainerDimensions(this.contentRef);
+            const imageDimensions = getDimensions(this.contentRef);
 
             if (!isEqualDimensions(containerDimensions, getDimensions(this.state.containerDimensions)) || 
                 !isEqualDimensions(imageDimensions, getDimensions(this.state.imageDimensions))) {
@@ -530,7 +530,7 @@ export default class PinchZoomPan extends React.Component {
                     onDragStart: tryCancelEvent,
                     onLoad: this.handleImageLoad,
                     onContextMenu: tryCancelEvent,
-                    ref: this.handleRefImage,
+                    ref: this.handleContentRef,
                     style: imageStyle(this.state)
                 })}
             </div>
@@ -564,12 +564,12 @@ export default class PinchZoomPan extends React.Component {
 
     componentWillUnmount() {
         this.cancelAnimation();
-        this.imageRef.removeEventListener('touchmove', this.handleTouchMove);
+        this.contentRef.removeEventListener('touchmove', this.handleTouchMove);
         window.removeEventListener('resize', this.handleWindowResize);
     }
 
     get isImageReady() {
-        return this.isImageLoaded || (this.imageRef && this.imageRef.tagName !== 'IMG');
+        return this.isImageLoaded || (this.contentRef && this.contentRef.tagName !== 'IMG');
     }
 
     get isTransformInitialized() {

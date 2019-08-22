@@ -55,6 +55,28 @@ const FlexContainerView = ({menu}) => (
     </div>
 )
 
+const SVGContainerView = ({menu}) => {
+    const width = 500
+    const height = 500
+    const style = {
+        fill:'rgb(0,0,255)',
+        strokeWidth:3,
+        stroke:'rgb(0,0,0)',
+    }
+    return (
+        <div>
+            <nav>{menu}</nav>
+            <main style={{ width: `${width}px`, height: `${height}px` }}>
+                <PinchZoomPan doubleTapBehavior='zoom' position='center' initialScale={1} minScale={1} maxScale={4} zoomButtons={false} debug={isDevelopment()}>
+                    <svg width="1500" height="800">
+                        <rect width="300" height="100" style={style} />
+                    </svg>
+                </PinchZoomPan>
+            </main>
+        </div>
+    )
+}
+
 const Menu = ({viewId, onViewChange}) => {
     const getLinkStyle = linkViewId => {
         return {
@@ -72,13 +94,14 @@ const Menu = ({viewId, onViewChange}) => {
             <a href='#' onClick={() => onViewChange(1)} style={getLinkStyle(1)}>Medium</a>
             <a href='#' onClick={() => onViewChange(3)} style={getLinkStyle(3)}>Centered</a>
             <a href='#' onClick={() => onViewChange(2)} style={getLinkStyle(2)}>Full-screen Flex</a>
+            <a href='#' onClick={() => onViewChange(4)} style={getLinkStyle(4)}>With an SVG</a>
         </React.Fragment>
     );
 }
 
 class App extends React.Component {
     state = {
-        viewId: 0
+        viewId: 4
     }
     
     handleViewChange = viewId => {
@@ -92,6 +115,7 @@ class App extends React.Component {
         const menu = <Menu viewId={viewId} onViewChange={this.handleViewChange} />
         return (
             viewId === 2 ? <FlexContainerView menu={menu} />
+            : viewId === 4 ? <SVGContainerView menu={menu} />
             : viewId === 3 ? <CenteredView menu={menu} width={300} height={500} imageWidth={200} imageHeight={400} />
             : viewId === 1 ? <SizedContainerView menu={menu} width={500} height={800} />
             : <SizedContainerView menu={menu} width={300} height={500} />
