@@ -209,7 +209,6 @@ export default class PinchZoomPan extends React.Component {
     handleWindowResize = () => this.maybeHandleDimensionsChanged();
     
     handleContentRef = ref => {
-        console.log(ref)
         if (this.contentRef) {
             this.cancelAnimation();
             this.contentRef.removeEventListener('touchmove', this.handleTouchMove);

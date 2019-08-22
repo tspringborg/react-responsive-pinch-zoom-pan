@@ -56,20 +56,36 @@ const FlexContainerView = ({menu}) => (
 )
 
 const SVGContainerView = ({menu}) => {
-    const width = 500
-    const height = 500
     const style = {
         fill:'rgb(0,0,255)',
         strokeWidth:3,
         stroke:'rgb(0,0,0)',
     }
+    const randomColor = () => {
+        return {
+            ...style,
+            fill: '#'+(Math.random()*0xFFFFFF<<0).toString(16),
+        }
+    }
     return (
         <div>
             <nav>{menu}</nav>
-            <main style={{ width: `${width}px`, height: `${height}px` }}>
-                <PinchZoomPan doubleTapBehavior='zoom' position='center' initialScale={1} minScale={1} maxScale={4} zoomButtons={false} debug={isDevelopment()}>
-                    <svg width="1500" height="800">
-                        <rect width="300" height="100" style={style} />
+            <main style={{ width: '90vw', height: '80vh', border: "1px solid red"}}>
+                <PinchZoomPan 
+                    doubleTapBehavior='zoom'
+                    position='center'
+                    initialScale={1}
+                    minScale={1}
+                    maxScale={4}
+                    zoomButtons={false}
+                    debug={isDevelopment()}
+                >
+                    <svg width="100%" height="100%" viewBox="0 0 1000 1000">
+                        <rect x="0" y="0" width="100" height="100" style={randomColor()} />
+                        <rect x="900" y="0" width="100" height="100" style={randomColor()} />
+                        <rect x="900" y="900" width="100" height="100" style={randomColor()} />
+                        <rect x="0" y="900" width="100" height="100" style={randomColor()} />
+                        <rect x="400" y="400" width="100" height="100" style={randomColor()} />
                     </svg>
                 </PinchZoomPan>
             </main>

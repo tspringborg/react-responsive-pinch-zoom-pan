@@ -49,10 +49,17 @@ export const getDimensions = object => {
     if (object === undefined) {
         return undefined;
     }
-    return {
-        width: object.offsetWidth || object.width,
-        height: object.offsetHeight || object.height,
-    };
+    let width = object.offsetWidth || object.width
+    let height = object.offsetHeight || object.height
+    const nodeName = object.nodeName || false
+    if (nodeName) {
+        if (nodeName.toLowerCase() !== 'img') {
+            const bounds = object.getBoundingClientRect()
+            width = bounds.width
+            height = bounds.height
+        }
+    }
+    return { width, height };
 }
 
 export const getContainerDimensions = image => {
